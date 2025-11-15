@@ -1,4 +1,9 @@
+import React, { useState } from "react";
+
 export default function List({ title, id, completed, todoData, setTodoData }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(title);
+
   const btnStyle = {
     color: "#fff",
     border: "none",
@@ -32,22 +37,74 @@ export default function List({ title, id, completed, todoData, setTodoData }) {
     setTodoData(newTodoData);
   };
 
-  return (
-    <div style={getStyle(completed)}>
-      <input
-        type="checkbox"
-        checked={completed}
-        onChange={() => handleCompleteChange(id)}
-      />
-      {title}
-      <button
-        style={btnStyle}
-        onClick={() => {
-          handleClick(id);
-        }}
-      >
-        X
-      </button>
-    </div>
-  );
+  const handleEditChange = (e) => {
+    setEditTitle(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newTodoData = todoData.map((data) => {
+      if (data.id === id) {
+        data.title = editTitle;
+      }
+      return data;
+    });
+
+    setTodoData(newTodoData);
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div>
+        <form style={getStyle(completed)} onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={editTitle}
+            autoFocus
+            onChange={handleEditChange}
+          />
+          <button
+            type="button"
+            style={btnStyle}
+            onClick={() => {
+              handleClick(id);
+            }}
+          >
+            X
+          </button>
+          <button type="submit" style={btnStyle}>
+            Save
+          </button>
+        </form>
+      </div>
+    );
+  } else {
+    return (
+      <div style={getStyle(completed)}>
+        <input
+          type="checkbox"
+          checked={completed}
+          onChange={() => handleCompleteChange(id)}
+        />
+        {title}
+        <button
+          style={btnStyle}
+          onClick={() => {
+            handleClick(id);
+          }}
+        >
+          X
+        </button>
+        <button
+          style={btnStyle}
+          onClick={() => {
+            setIsEditing(true);
+          }}
+        >
+          Edit
+        </button>
+      </div>
+    );
+  }
 }
